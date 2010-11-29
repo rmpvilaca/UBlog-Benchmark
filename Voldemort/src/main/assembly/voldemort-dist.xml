@@ -1,0 +1,40 @@
+<assembly>
+  <id>Voldemort implementation UBlog Benchmark</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/lib</outputDirectory>
+      <unpack>false</unpack>
+    </dependencySet>
+  </dependencySets>
+
+  <files>
+    <file>
+      <source>target/${project.artifactId}-${project.version}.jar</source>
+      <outputDirectory>/lib</outputDirectory>
+    </file>
+    <file>
+      <source>${basedir}/../GraphServer/target/graph-server-1.0-SNAPSHOT-client.jar</source>
+      <outputDirectory>/lib</outputDirectory>
+    </file>
+  </files>
+  <fileSets>
+    <fileSet>
+      <outputDirectory>/</outputDirectory>
+      <directory>src/main/bin</directory>
+      <fileMode>0755</fileMode>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>/conf</outputDirectory>
+      <directory>src/main/resources</directory>
+    </fileSet>
+    <fileSet>
+      <outputDirectory>/lib</outputDirectory>
+      <directory>${basedir}/../lib</directory>
+    </fileSet>
+  </fileSets>
+<includeBaseDirectory>false</includeBaseDirectory>
+</assembly>

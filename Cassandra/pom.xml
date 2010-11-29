@@ -1,0 +1,177 @@
+<!--
+  Copyright 2010 Universidade do Minho, Ricardo Vilaça and Francisco Cruz
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.ublog</groupId>
+  <artifactId>ublog-benchmark-cassandra</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <properties>
+    <maven.compiler.source>1.6</maven.compiler.source>
+    <maven.compiler.target>1.6</maven.compiler.target>
+  </properties>
+  <name>UBlog Benchmark' Cassandra Implementation</name>
+  <url>http://maven.apache.org</url>
+  <dependencies>
+  	<dependency>
+      <groupId>org.ublog</groupId>
+      <artifactId>ublog-benchmark</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+<dependency>
+<groupId>commons-configuration</groupId>
+  <artifactId>commons-configuration</artifactId>
+        <version>1.6</version>
+          </dependency>
+    <dependency>
+      <groupId>com.eaio.uuid</groupId>
+      <artifactId>uuid</artifactId>
+      <version>3.1</version>
+      </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+    	<groupId>log4j</groupId>
+    	<artifactId>log4j</artifactId>
+    	<version>1.2.14</version>
+    </dependency>
+    <dependency>
+   	 <groupId>commons-codec</groupId>
+     <artifactId>commons-codec</artifactId>
+     <version>1.4</version>
+	</dependency>
+	<dependency>
+     <groupId>commons-lang</groupId>
+     <artifactId>commons-lang</artifactId>
+     <version>2.4</version>
+	</dependency>
+	<dependency>
+     <groupId>commons-pool</groupId>
+     <artifactId>commons-pool</artifactId>
+     <version>1.5.3</version>
+    </dependency>
+    <dependency>
+     <groupId>com.google.collections</groupId>
+     <artifactId>google-collections</artifactId>
+     <version>1.0</version>
+	</dependency>
+	<dependency>
+     <groupId>org.perf4j</groupId>
+     <artifactId>perf4j</artifactId>
+     <version>0.9.12</version>
+	</dependency>	
+	<dependency>
+     <groupId>org.slf4j</groupId>
+     <artifactId>slf4j-api</artifactId>
+     <version>1.5.8</version>
+	</dependency>
+	<dependency>
+     <groupId>org.slf4j</groupId>
+     <artifactId>slf4j-log4j12</artifactId>
+     <version>1.5.8</version>
+	</dependency>
+	<!-- lib which I could not find in the maven repos -->
+     <dependency>
+      <groupId>libthrift</groupId>
+      <artifactId>libthrift</artifactId>
+      <version>UNKNOWN</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../lib/libthrift-r917130.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>hector</groupId>
+      <artifactId>hector</artifactId>
+      <version>0.6.0-11</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/../lib/hector-0.6.0-14.jar</systemPath>
+    </dependency>
+    <dependency>
+     <groupId>org.apache.cassandra</groupId>
+  	 <artifactId>cassandra</artifactId>
+	 <version>0.6.1</version>
+	 <scope>system</scope>
+     <systemPath>${basedir}/../lib/apache-cassandra-0.6.1.jar</systemPath>
+    </dependency>
+   </dependencies>
+<build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptors>
+            <descriptor>src/main/assembly/cassandra-dist.xml</descriptor>
+          </descriptors>
+        </configuration>
+      </plugin>
+    </plugins>
+<resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+        </excludes>
+      </resource>
+     </resources>
+  </build>
+<repositories>
+    <repository>
+      <id>Mirrors</id>
+      <url>http://mirrors.ibiblio.org/pub/mirrors/maven2/</url>
+    </repository>
+    <repository>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>warn</checksumPolicy>
+			</snapshots>
+			<id>com.eaio</id>
+			<name>eaio.com repository</name>
+			<url>http://eaio.com/maven2</url>
+		</repository>
+	<repository>
+      <id>gorda.stable</id>
+      <name>GORDA Jar repository</name>
+      <url>http://gorda.di.uminho.pt/community/maven/stables</url>
+    </repository>
+  </repositories>
+  
+   <distributionManagement>
+    <repository>
+      <id>gorda</id>
+      <name>GORDA Jar Repository</name>
+      <url>scpexe://mvn.lsd.di.uminho.pt/home/ftp/pub/maven2/gorda.stable/storage/</url>
+    </repository>
+  </distributionManagement>
+  
+</project>

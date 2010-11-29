@@ -1,0 +1,113 @@
+\documentclass[12pt]{article}
+
+\usepackage{hyperref}
+\usepackage{subfigure}
+\usepackage{listings}  
+\usepackage{graphicx,url}
+\usepackage{paralist}
+
+
+\begin{document}
+
+\title{UBlog benchmark}
+\author{Ricardo Vila\c{c}a, Rui Oliveira and Jos´\'{e} Pereira\\
+Universidade do Minho\\
+\{rmvilaca,rco,jop\}@di.uminho.pt}
+
+
+\maketitle
+
+\thispagestyle{empty}
+
+
+\section{Test workload}
+\label{sec:workload}
+
+UBlog benchmark mimics the usage of the Twitter social network. 
+
+Twitter is an online social network application offering a simple
+micro-blogging service consisting of small user posts,
+the \emph{tweets}. A user gets access to other user tweets by explicitly stating a \emph{follow} relationship.
+
+The central feature of Twitter is the user \emph{timeline}. A user's timeline
+is the stream of tweets from the users she \emph{follows} and from her own.
+Tweets are free form strings up to 140 characters. Tweets may contain two
+kinds of tags, user mentions formed by a user's id preceded by $@$ (e.g..
+$@$john) and hashtags, arbitrary words preceded by $\#$ (e.g.. $\#$topic) meant
+to be the target of searches for related tweets.
+
+Our workload definition has been shaped by the results of recent studies on
+Twitter~\cite{whyWeTwitter,chipsTwitter,retweet}. In particular, we consider
+just the subset of the seven most used operations from the Twitter
+API~\cite{twitterAPI} (Search and REST API as of March 2010):
+
+~
+
+{
+\texttt{$Tweet^*$ statuses\_user\_timeline(String userID, int s, int c)} retrieves from userID's tweets, in reverse chronological order, up to c tweets starting from s (read only operation).
+
+\texttt{$Tweet^*$
+statuses\_friends\_timeline(String userID, int s, int c)} retrieves from
+userID's timeline, in reverse chronological order, up to c tweets starting
+from s. This operation allows to obtain the a user's timeline incrementally
+(read only operation).
+
+\texttt{$Tweet^*$ statuses\_mentions(String userID)} retrieves the most recent tweets mentioning userID's in reverse chronological order (read only operation).
+
+\texttt{$Tweet^*$ search\_contains\_hashtag(String  topic)} searches the system for tweets containing topic as hashtag (read only operation).
+	
+\texttt{statuses\_update(Tweet tweet)} appends a new tweet to the system (update operation).
+	
+\texttt{friendships\_create(String userID, String toStartUserID)} allows userID to follow toStartUserID (update operation).
+	
+\texttt{friendships\_destroy(String userID, String toStopUserID)}
+allows userID to unfollow toStopUserID (update operation).
+	
+}
+
+~
+
+For the implementation of the test workload we consider a simple data model of three collections: \verb+users+, \verb+tweets+ and \verb+timelines+. The \verb+users+ collection is keyed by userid and for each user it stores profile data (name, password, and date of creation), the list of the user's followers, a list of users the user follows, and the user's tweetid, an increasing sequence number. The \verb+tweets+ collection is keyed by a compound of userid and tweetid. It stores the tweets' text and date, and associated user and topic tags if present. The \verb+timelines+ collection stores the timeline for each user. It is keyed by userid and each entry contains a list of pairs (tweetid, date) in reverse chronological order.
+
+In a nutshell, the operations listed above manipulate these data structures as
+follows. The \verb+statuses_update+ operation reads and updates the user's
+current tweet sequence number from \verb+users+, appends the new tweet to
+\verb+tweets+ and updates the timeline for the user and each of the user's
+follower in \verb+timelines+. The \verb+friendships_create+ and
+\verb+friendships_destroy+ operations update the involved users records in
+\verb+users+ and recomputes the follower's \verb+timelines+
+adding or removing the most recent tweets from the followed, or unfollowed, user. Regarding the read only operations, \verb+statuses_friends_timeline+ simply accesses the specified user timeline record in \verb+timelines+, \verb+statuses_user_timeline+ accesses a range of the user's tweets, and \verb+statuses_mentions+ and \verb+search_contains_hashtag+ the \verb+tweets+ collection in general.
+
+
+The application is firstly initialized with a set of users (that remains unchanged throughout the experiments), a graph of follow relationships and a set of tweets. 
+
+Twitter's network belongs to a class of scale-free networks and exhibit
+a small world phenomenon~\cite{whyWeTwitter}. As such, the set of users and their follow relationships are determined by a directed graph created with the help of a scale-free graph generator~\cite{scaleFree}.
+
+In order to fulfill \verb+statuses_user_timeline+, \verb+statuses_friends_timeline+ and \verb+statuses_mentions+ requests right from the start of the experiments, the application is populated with initial tweets. The generation of tweets, both for the initialization phase and for the workload, follows a couple of observations over Twitter traces~\cite{chipsTwitter,retweet}. First, the number of tweets per user is proportional to the user's followers~\cite{chipsTwitter}. From all tweets, 36\% mention some user and 5\% refer to a topic~\cite{retweet}. Mentions in tweets are created by randomly choosing a user from the set of friends. Topics are chosen using a power-law distribution~\cite{whyWeTwitter}.
+
+Each run of the workload consists of a specified number of operations. The next operation is randomly chosen taking into account the probabilities of occurrence. The defaults values are depicted in Table~\ref{tab:operations}. To our knowledge, no statistics about the particular occurrences of each of the Twitter operations are publicly available. The figures of Table~\ref{tab:operations} are biased towards a read intensive workload and based on discussions that took place during Twitter's Chirp conference (the Twitter official developers conference, e.g.. \url{http://pt.justin.tv/twitterchirp/b/262219316}). 
+
+The defined workload may be used with both key-value stores 
+and relational databases. Currently, there are implementations for Cassandra, Voldemort, and MySQL.
+
+\begin{table}
+\centering
+\caption{Probability of Operations}
+\begin{tabular}{|c|c|} \hline
+Operation&Probability\\ \hline
+search\_contains\_hashtag & 15\% \\ \hline
+statuses\_mentions & 25\% \\ \hline
+statuses\_user\_timeline & 5\% \\ \hline
+statuses\_friends\_timeline & 45\% \\ \hline
+statuses\_update & 5\% \\ \hline
+friendships\_create & 2.5\% \\ \hline
+friendships\_destroy & 2.5\% \\
+\hline\end{tabular}
+\label{tab:operations}
+\end{table}
+
+\bibliographystyle{plain}
+\bibliography{ublog}
+
+\end{document}
